@@ -31,6 +31,19 @@ export default function Home() {
     state: { columnVisibility },
   })
 
+  interface TakenBy {
+    car_model?: string;
+    car_brand?: string;
+    service?: number;
+    phone_number?: string;
+  }
+
+  interface JobItem {
+    queue_id: number;
+    iorder: number;
+    takenby: TakenBy;
+  }
+
   useEffect(() => {
   async function fetchData() {
     setLoading(true); // Start loading
@@ -38,7 +51,7 @@ export default function Home() {
       const response = await fetch(`/api/users?date=${selectedDate}`);
       const jsonData = await response.json();
 
-      console.log("Fetched Data:", jsonData);
+      console.log("Fetched Data:", jsonData.item);
 
       let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0;
 
@@ -59,8 +72,8 @@ export default function Home() {
       const groupedData: Record<number, { time: string; cars: string[]; brands: string[]; types: number[], phones: string[] }> = {};
 
       jsonData
-        .filter((item: any) => item.queue_id >= queueRange[0] && item.queue_id <= queueRange[1])
-        .forEach((item: any) => {
+        .filter((item: JobItem) => item.queue_id >= queueRange[0] && item.queue_id <= queueRange[1])
+        .forEach((item: JobItem) => {
           let takenby = item.takenby;
           if (!takenby) return;
 
