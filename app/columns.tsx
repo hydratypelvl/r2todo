@@ -4,12 +4,13 @@ import { ColumnDef } from "@tanstack/react-table"
 import { CarFront, Bike, ThermometerSnowflake, CircleHelp } from "lucide-react"
 
 // Job Data Type
-export type Job = {
-  time: string
-  car: string
-  brand: string
-  type: number
-  rowSpan: number
+export interface Job {
+  time: string;
+  car: string;
+  brand: string;
+  type: number;
+  phone: string;
+  rowSpan: number;
 }
 
 // Table Columns
