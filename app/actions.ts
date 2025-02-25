@@ -31,8 +31,8 @@ export async function fetchJobs(date: string): Promise<SanitizedJob[]> {
         queue_id: row.queue_id,
         iorder: row.iorder,
         takenby: {
-          car_brand: parsedTakenBy.car_brand?.trim() || "Unknown Brand",
-          car_model: parsedTakenBy.car_model?.trim() || "Unknown Model",
+          car_brand: parsedTakenBy.car_brand?.trim() || "N/A",
+          car_model: parsedTakenBy.car_model?.trim() || "N/A",
           service: Number(parsedTakenBy.service) || 0,
           phone: formatPhoneNumber(parsedTakenBy.phone_number?.toString() || "")
         }

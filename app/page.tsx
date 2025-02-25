@@ -15,9 +15,20 @@ import { TasksSkeleton } from "@/components/skeletons/TasksSkeleton"
 import { PieChartSkeleton } from "@/components/skeletons/PieChartSkeleton"
 import { fetchJobs } from "@/app/actions"
 
+interface SanitizedJob {
+  queue_id: number
+  iorder: number
+  takenby: {
+    car_brand: string
+    car_model: string
+    service: number
+    phone: string
+  }
+}
 
 export default function Home() {
-  const [data, setData] = useState<Job[]>([])
+  const [allData, setAllData] = useState<SanitizedJob[]>([])
+  const [filteredData, setFilteredData] = useState<Job[]>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [queueRange, setQueueRange] = useState<[number, number]>([1, 3])
   const [totals, setTotals] = useState({ all: 0, cars: 0, ac: 0, bikes: 0 })
@@ -25,118 +36,114 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(true)
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     state: { columnVisibility },
   })
 
+  // Fetch all data when date changes
   useEffect(() => {
-    async function loadData() {
+    async function loadAllData() {
       setLoading(true)
       try {
         const jsonData = await fetchJobs(selectedDate)
-        
-        let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0
-
-        const formatTime = (iorder: number) => {
-          const baseHour = 9
-          const minutes = iorder * 15
-          const hours = baseHour + Math.floor(minutes / 60)
-          const mins = minutes % 60
-          return `${hours}:${mins.toString().padStart(2, "0")}`
-        }
-
-        const groupedData: Record<number, { 
-          time: string
-          cars: string[]
-          brands: string[]
-          types: number[]
-          phones: string[]
-        }> = {}
-console.log(jsonData)
-        jsonData
-          .filter(item => {
-            // Validate queue_id range
-            return item.queue_id >= queueRange[0] && 
-                   item.queue_id <= queueRange[1] &&
-                   item.takenby.service > 0 // Exclude invalid services
-          })
-          .forEach(item => {
-            const { takenby } = item
-            const time = formatTime(item.iorder)
-
-            if (!groupedData[item.iorder]) {
-              groupedData[item.iorder] = { 
-                time, 
-                cars: [], 
-                brands: [], 
-                types: [], 
-                phones: [] 
-              }
-            }
-
-            // Handle undefined/empty values
-            const carBrand = takenby.car_brand === "N/A" || !takenby.car_brand 
-              ? "Unknown Brand" 
-              : takenby.car_brand
-
-            const carModel = takenby.car_model === "N/A" || !takenby.car_model
-              ? "Unknown Model"
-              : takenby.car_model
-
-            groupedData[item.iorder].cars.push(carModel)
-            groupedData[item.iorder].brands.push(carBrand)
-            groupedData[item.iorder].types.push(takenby.service)
-            groupedData[item.iorder].phones.push(takenby.phone)
-
-            totalAll++
-            
-            // Service type categorization
-            switch (takenby.service) {
-              case 1:
-              case 2:
-              case 3:
-                totalCars++
-                break
-              case 6:
-                totalAC++
-                break
-              case 8:
-              case 9:
-                totalBikes++
-                break
-              default:
-                console.warn('Unknown service type:', takenby.service)
-            }
-          })
-
-        const formattedData: Job[] = Object.entries(groupedData).flatMap(
-          ([, { time, cars, brands, types, phones }]) =>
-            cars.map((car, index) => ({
-              time: index === 0 ? time : "",
-              car,
-              brand: brands[index],
-              type: types[index],
-              phone: phones[index],
-              rowSpan: index === 0 ? cars.length : 0,
-            }))
-        )
-
-        setData(formattedData)
-        setTotals({ all: totalAll, cars: totalCars, ac: totalAC, bikes: totalBikes })
+        setAllData(jsonData)
       } catch (error) {
         console.error("Data loading error:", error)
-        setData([])
+        setAllData([])
+        setFilteredData([])
         setTotals({ all: 0, cars: 0, ac: 0, bikes: 0 })
       } finally {
+        
         setLoading(false)
       }
     }
+    
+    loadAllData()
+  }, [selectedDate])
 
-    loadData()
-  }, [selectedDate, queueRange])
+  // Process and filter data when queue range or allData changes
+  useEffect(() => {
+    if (allData.length === 0) return
+
+    let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0
+
+    const formatTime = (iorder: number) => {
+      const baseHour = 9
+      const minutes = iorder * 15
+      const hours = baseHour + Math.floor(minutes / 60)
+      const mins = minutes % 60
+      return `${hours}:${mins.toString().padStart(2, "0")}`
+    }
+
+    const groupedData: Record<number, { 
+      time: string
+      cars: string[]
+      brands: string[]
+      types: number[]
+      phones: string[]
+    }> = {}
+
+    allData
+      .filter(item => 
+        item.queue_id >= queueRange[0] && 
+        item.queue_id <= queueRange[1] &&
+        item.takenby.service > 0
+      )
+      .forEach(item => {
+        const { takenby } = item
+        const time = formatTime(item.iorder)
+
+        if (!groupedData[item.iorder]) {
+          groupedData[item.iorder] = { 
+            time, 
+            cars: [], 
+            brands: [], 
+            types: [], 
+            phones: [] 
+          }
+        }
+
+        groupedData[item.iorder].cars.push(takenby.car_model)
+        groupedData[item.iorder].brands.push(takenby.car_brand)
+        groupedData[item.iorder].types.push(takenby.service)
+        groupedData[item.iorder].phones.push(takenby.phone)
+
+        totalAll++
+        
+        switch (takenby.service) {
+          case 1:
+          case 2:
+          case 3:
+            totalCars++
+            break
+          case 6:
+            totalAC++
+            break
+          case 8:
+          case 9:
+            totalBikes++
+            break
+        }
+      })
+
+      const formattedData: Job[] = Object.entries(groupedData).flatMap(
+        ([, { time, cars, brands, types, phones }]) => 
+          cars.map((car, index) => ({
+            time: index === 0 ? time : "",
+            car,
+            brand: brands[index],
+            type: types[index],
+            phone: phones[index],
+            rowSpan: index === 0 ? cars.length : 0,
+          }))
+      )
+  
+      setFilteredData(formattedData)
+      setTotals({ all: totalAll, cars: totalCars, ac: totalAC, bikes: totalBikes })
+    }, [allData, queueRange])
 
   return (
     <div className="container mx-auto my-4">
@@ -168,7 +175,10 @@ console.log(jsonData)
           </div>
 
           <div className="flex justify-between my-2">
-            <Diena onDateChange={setSelectedDate} />
+          <Diena 
+            onDateChange={setSelectedDate} 
+            value={selectedDate}
+          />
             <ColumnVisibilityToggle table={table} />
           </div>
         </>
