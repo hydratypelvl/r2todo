@@ -46,46 +46,49 @@ export default function Home() {
   // Fetch all data when date changes
   useEffect(() => {
     async function loadAllData() {
-      setLoading(true)
+      setLoading(true);
       try {
-        const jsonData = await fetchJobs(selectedDate)
-        setAllData(jsonData)
+        const jsonData = await fetchJobs(selectedDate);
+        setAllData(jsonData);
       } catch (error) {
-        console.error("Data loading error:", error)
-        setAllData([])
-        setFilteredData([])
-        setTotals({ all: 0, cars: 0, ac: 0, bikes: 0 })
+        console.error("Data loading error:", error);
+        setAllData([]);
+        setFilteredData([]);
+        setTotals({ all: 0, cars: 0, ac: 0, bikes: 0 });
       } finally {
-        
-        setLoading(false)
+        setLoading(false);
       }
     }
     
-    loadAllData()
-  }, [selectedDate])
+    loadAllData();
+  }, [selectedDate]);
 
   // Process and filter data when queue range or allData changes
   useEffect(() => {
-    if (allData.length === 0) return
-
-    let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0
-
-    const formatTime = (iorder: number) => {
-      const baseHour = 9
-      const minutes = iorder * 15
-      const hours = baseHour + Math.floor(minutes / 60)
-      const mins = minutes % 60
-      return `${hours}:${mins.toString().padStart(2, "0")}`
+    if (allData.length === 0) {
+      setFilteredData([]);
+      setTotals({ all: 0, cars: 0, ac: 0, bikes: 0 });
+      return;
     }
-
+  
+    let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0;
+  
+    const formatTime = (iorder: number) => {
+      const baseHour = 9;
+      const minutes = iorder * 15;
+      const hours = baseHour + Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${hours}:${mins.toString().padStart(2, "0")}`;
+    };
+  
     const groupedData: Record<number, { 
-      time: string
-      cars: string[]
-      brands: string[]
-      types: number[]
-      phones: string[]
-    }> = {}
-
+      time: string;
+      cars: string[];
+      brands: string[];
+      types: number[];
+      phones: string[];
+    }> = {};
+  
     allData
       .filter(item => 
         item.queue_id >= queueRange[0] && 
@@ -93,9 +96,9 @@ export default function Home() {
         item.takenby.service > 0
       )
       .forEach(item => {
-        const { takenby } = item
-        const time = formatTime(item.iorder)
-
+        const { takenby } = item;
+        const time = formatTime(item.iorder);
+  
         if (!groupedData[item.iorder]) {
           groupedData[item.iorder] = { 
             time, 
@@ -103,32 +106,32 @@ export default function Home() {
             brands: [], 
             types: [], 
             phones: [] 
-          }
+          };
         }
-
-        groupedData[item.iorder].cars.push(takenby.car_model)
-        groupedData[item.iorder].brands.push(takenby.car_brand)
-        groupedData[item.iorder].types.push(takenby.service)
-        groupedData[item.iorder].phones.push(takenby.phone)
-
-        totalAll++
+  
+        groupedData[item.iorder].cars.push(takenby.car_model);
+        groupedData[item.iorder].brands.push(takenby.car_brand);
+        groupedData[item.iorder].types.push(takenby.service);
+        groupedData[item.iorder].phones.push(takenby.phone);
+  
+        totalAll++;
         
         switch (takenby.service) {
           case 1:
           case 2:
           case 3:
-            totalCars++
-            break
+            totalCars++;
+            break;
           case 6:
-            totalAC++
-            break
+            totalAC++;
+            break;
           case 8:
           case 9:
-            totalBikes++
-            break
+            totalBikes++;
+            break;
         }
-      })
-
+      });
+  
       const formattedData: Job[] = Object.entries(groupedData).flatMap(
         ([, { time, cars, brands, types, phones }]) => 
           cars.map((car, index) => ({
@@ -139,11 +142,11 @@ export default function Home() {
             phone: phones[index],
             rowSpan: index === 0 ? cars.length : 0,
           }))
-      )
+      );
   
-      setFilteredData(formattedData)
-      setTotals({ all: totalAll, cars: totalCars, ac: totalAC, bikes: totalBikes })
-    }, [allData, queueRange])
+      setFilteredData(formattedData);
+      setTotals({ all: totalAll, cars: totalCars, ac: totalAC, bikes: totalBikes });
+  }, [allData, queueRange]);
 
   return (
     <div className="container mx-auto my-4">
