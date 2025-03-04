@@ -44,7 +44,7 @@ export function Diena({ onDateChange, value }: {
           className={cn("w-[240px] pl-3 text-left font-normal", !selectedDate && "text-muted-foreground")}
         >
           {selectedDate ? (
-            format(selectedDate, "dd LLLL cccc", { locale: lv })
+            format(selectedDate, "d LLLL cccc", { locale: lv })
           ) : (
             <span>Izvēlies datumu</span>
           )}
@@ -58,7 +58,8 @@ export function Diena({ onDateChange, value }: {
           onSelect={handleDateSelect}
           disabled={(date) => 
             date < new Date("2023-09-25") || 
-            date > new Date(new Date().setDate(new Date().getDate() + 10))
+            date > new Date(new Date().setDate(new Date().getDate() + 10)) ||
+            date.getDay() === 0
           }
           initialFocus
           locale={lv}
