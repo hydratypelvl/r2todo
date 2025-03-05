@@ -17,23 +17,23 @@ export interface Job {
 export const columns: ColumnDef<Job>[] = [
     {
       accessorKey: "time",
-      header: "Time",
+      header: "Laiks",
     },
     {
       accessorKey: "brand",
-      header: "Brand",
+      header: "Marka",
     },
     {
       accessorKey: "car",
-      header: "Car Model",
+      header: "Modelis",
     },
     {
       accessorKey: "phone",
-      header: "Phone Number",
+      header: "Telefons",
     },
     {
       accessorKey: "type",
-      header: () => <div>Type</div>,
+      header: () => <div>Tips</div>,
       cell: ({ row }) => {
         const type = Number(row.getValue("type")) || 0; // Convert to number
 
