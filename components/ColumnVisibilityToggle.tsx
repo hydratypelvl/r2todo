@@ -12,6 +12,14 @@ interface ColumnVisibilityToggleProps<TData> {
 }
 
 export function ColumnVisibilityToggle<TData>({ table }: ColumnVisibilityToggleProps<TData>) {
+  const columnDisplayNames: { [key: string]: string } = {
+    time: "Laiks",
+    brand: "Marka",
+    car: "Modelis",
+    phone: "Telefons",
+    type: "Tips",
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,17 +30,17 @@ export function ColumnVisibilityToggle<TData>({ table }: ColumnVisibilityToggleP
           .getAllColumns()
           .filter((column) => column.getCanHide())
           .map((column) => {
+            const displayName = columnDisplayNames[column.id] || column.id;
             return (
               <DropdownMenuCheckboxItem
                 key={column.id}
                 className="capitalize"
                 checked={column.getIsVisible()}
                 onCheckedChange={(checked) => {
-                  console.log(`Toggling ${column.id}: ${checked}`); // Debugging
                   column.toggleVisibility(checked);
                 }}
               >
-                {column.id}
+                {displayName}
               </DropdownMenuCheckboxItem>
             );
           })}
