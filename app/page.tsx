@@ -32,8 +32,16 @@ export default function Home() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [queueRange, setQueueRange] = useState<[number, number]>([1, 3])
   const [totals, setTotals] = useState({ all: 0, cars: 0, ac: 0, bikes: 0 })
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
+  const [selectedDate, setSelectedDate] = useState<string>(getLocalDate())
   const [loading, setLoading] = useState<boolean>(true)
+
+  function getLocalDate(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
   const table = useReactTable({
     data: filteredData,
