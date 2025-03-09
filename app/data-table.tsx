@@ -53,7 +53,6 @@ const isTimeBeforeCurrentMinus15 = (time: string): boolean => {
 export function DataTable<TData extends DataTableRow>({
   table,
 }: DataTableProps<TData>) {
-  let affectedRowsCount = 0; // Counter for rows before (current time - 15 minutes)
   let remainingRowsCount = 0; // Counter for rows after (current time - 15 minutes)
 
   return (
@@ -89,12 +88,8 @@ export function DataTable<TData extends DataTableRow>({
                 const isAffected = isTimeBeforeCurrentMinus15(time);
                 // Check if the time matches the current time
                 const isCurrent = isCurrentTime(time);
-
-                if (isAffected) {
-                  affectedRowsCount++; // Increment the counter for affected rows
-                } else {
-                  remainingRowsCount++; // Increment the counter for remaining rows
-                }
+              
+                remainingRowsCount++; // Increment the counter for remaining rows
 
                 return (
                   <TableRow 
