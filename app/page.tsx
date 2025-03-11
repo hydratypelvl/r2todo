@@ -1,39 +1,51 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Job, columns } from "./columns"
-import { DataTable } from "./data-table"
-import { Button } from "@/components/ui/button"
-import { ModeToggle } from "@/components/ModeToggle"
-import { TasksCard } from "@/components/TasksCard"
-import { ColumnVisibilityToggle } from "@/components/ColumnVisibilityToggle"
-import { useReactTable, getCoreRowModel, VisibilityState } from "@tanstack/react-table"
-import { Diena } from "@/components/Diena"
-import { AppPieChart } from "@/components/AppPieChart"
-import { SkeletonTable } from "@/components/skeletons/SkeletonTable"
-import { TasksSkeleton } from "@/components/skeletons/TasksSkeleton"
-import { PieChartSkeleton } from "@/components/skeletons/PieChartSkeleton"
-import { fetchJobs } from "@/app/actions"
+import { useState, useEffect, useRef } from "react";
+import { Job, columns } from "./columns";
+import { DataTable } from "./data-table";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ModeToggle";
+import { TasksCard } from "@/components/TasksCard";
+import { ColumnVisibilityToggle } from "@/components/ColumnVisibilityToggle";
+import { useReactTable, getCoreRowModel, VisibilityState } from "@tanstack/react-table";
+import { Diena } from "@/components/Diena";
+import { AppPieChart } from "@/components/AppPieChart";
+import { SkeletonTable } from "@/components/skeletons/SkeletonTable";
+import { TasksSkeleton } from "@/components/skeletons/TasksSkeleton";
+import { PieChartSkeleton } from "@/components/skeletons/PieChartSkeleton";
+import { fetchJobs } from "@/app/actions";
+import { ArrowDownToLine } from "lucide-react";
 
 interface SanitizedJob {
-  queue_id: number
-  iorder: number
+  queue_id: number;
+  iorder: number;
   takenby: {
-    car_brand: string
-    car_model: string
-    service: number
-    phone: string
-  }
+    car_brand: string;
+    car_model: string;
+    service: number;
+    phone: string;
+  };
 }
 
 export default function Home() {
-  const [allData, setAllData] = useState<SanitizedJob[]>([])
-  const [filteredData, setFilteredData] = useState<Job[]>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [queueRange, setQueueRange] = useState<[number, number]>([1, 3])
-  const [totals, setTotals] = useState({ all: 0, cars: 0, ac: 0, bikes: 0 })
-  const [selectedDate, setSelectedDate] = useState<string>(getLocalDate())
-  const [loading, setLoading] = useState<boolean>(true)
+  const [allData, setAllData] = useState<SanitizedJob[]>([]);
+  const [filteredData, setFilteredData] = useState<Job[]>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [queueRange, setQueueRange] = useState<[number, number]>([1, 3]);
+  const [totals, setTotals] = useState({ all: 0, cars: 0, ac: 0, bikes: 0 });
+  const [selectedDate, setSelectedDate] = useState<string>(getLocalDate());
+  const [loading, setLoading] = useState<boolean>(true);
+  const [remainingRowsCount, setRemainingRowsCount] = useState<number>(0); // State for remaining rows count
+
+  // Ref for the current time row
+  const currentTimeRowRef = useRef<HTMLTableRowElement>(null);
+
+  // Function to scroll to the current time row
+  const scrollToCurrentTime = () => {
+    if (currentTimeRowRef.current) {
+      currentTimeRowRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
 
   function getLocalDate(): string {
     const now = new Date();
@@ -49,7 +61,7 @@ export default function Home() {
     getCoreRowModel: getCoreRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     state: { columnVisibility },
-  })
+  });
 
   // Fetch all data when date changes
   useEffect(() => {
@@ -78,9 +90,9 @@ export default function Home() {
       setTotals({ all: 0, cars: 0, ac: 0, bikes: 0 });
       return;
     }
-  
+
     let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0;
-  
+
     const formatTime = (iorder: number) => {
       const baseHour = 9;
       const minutes = iorder * 15;
@@ -88,7 +100,7 @@ export default function Home() {
       const mins = minutes % 60;
       return `${hours}:${mins.toString().padStart(2, "0")}`;
     };
-  
+
     const groupedData: Record<number, { 
       time: string;
       cars: string[];
@@ -96,7 +108,7 @@ export default function Home() {
       types: number[];
       phones: string[];
     }> = {};
-  
+
     allData
       .filter(item => 
         item.queue_id >= queueRange[0] && 
@@ -106,7 +118,7 @@ export default function Home() {
       .forEach(item => {
         const { takenby } = item;
         const time = formatTime(item.iorder);
-  
+
         if (!groupedData[item.iorder]) {
           groupedData[item.iorder] = { 
             time, 
@@ -116,12 +128,12 @@ export default function Home() {
             phones: [] 
           };
         }
-  
+
         groupedData[item.iorder].cars.push(takenby.car_model);
         groupedData[item.iorder].brands.push(takenby.car_brand);
         groupedData[item.iorder].types.push(takenby.service);
         groupedData[item.iorder].phones.push(takenby.phone);
-  
+
         totalAll++;
         
         switch (takenby.service) {
@@ -139,7 +151,7 @@ export default function Home() {
             break;
         }
       });
-  
+
       const formattedData: Job[] = Object.entries(groupedData).flatMap(
         ([, { time, cars, brands, types, phones }]) => 
           cars.map((car, index) => ({
@@ -151,7 +163,7 @@ export default function Home() {
             rowSpan: index === 0 ? cars.length : 0,
           }))
       );
-  
+
       setFilteredData(formattedData);
       setTotals({ all: totalAll, cars: totalCars, ac: totalAC, bikes: totalBikes });
   }, [allData, queueRange]);
@@ -186,11 +198,20 @@ export default function Home() {
           </div>
 
           <div className="flex justify-between my-2">
-          <Diena 
-            onDateChange={setSelectedDate} 
-            value={selectedDate}
-          />
+            <Diena 
+              onDateChange={setSelectedDate} 
+              value={selectedDate}
+            />
             <ColumnVisibilityToggle table={table} />
+            {/* Button to scroll to current time row */}
+            <Button onClick={scrollToCurrentTime} disabled={remainingRowsCount === 0} variant="outline">
+              <ArrowDownToLine />
+            </Button>
+          </div>
+
+          {/* Display remaining rows count */}
+          <div className="my-2 text-sm text-gray-600">
+            {remainingRowsCount === 0 ? 'Vairs nav mašīnu' : <p>Vēl palikušas {remainingRowsCount} mašīnas</p>}
           </div>
         </>
       )}
@@ -200,7 +221,11 @@ export default function Home() {
           <SkeletonTable />
         </div>
       ) : (
-        <DataTable table={table} />
+        <DataTable 
+          table={table} 
+          currentTimeRowRef={currentTimeRowRef} // Pass the ref to DataTable
+          onRemainingRowsCountChange={setRemainingRowsCount} // Pass the callback
+        />
       )}
 
       {loading ? (
@@ -219,5 +244,5 @@ export default function Home() {
         </div>
       )}
     </div>
-  )
+  );
 }
