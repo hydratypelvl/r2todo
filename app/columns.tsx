@@ -9,7 +9,7 @@ export interface Job {
   car: string;
   brand: string;
   type: number;
-  phone: string;
+  lic_plate: string;
   rowSpan: number;
 }
 
@@ -28,8 +28,13 @@ export const columns: ColumnDef<Job>[] = [
       header: "Modelis",
     },
     {
-      accessorKey: "phone",
-      header: "Telefons",
+      accessorKey: "lic_plate",
+      header: "Numurs",
+      cell: ({ row }) => (
+        <div className="tracking-[1px] whitespace-nowrap">  {/* Custom letter-spacing */}
+          {row.getValue("lic_plate")}
+        </div>
+      ),
     },
     {
       accessorKey: "type",

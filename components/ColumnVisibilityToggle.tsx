@@ -16,7 +16,7 @@ export function ColumnVisibilityToggle<TData>({ table }: ColumnVisibilityToggleP
     time: "Laiks",
     brand: "Marka",
     car: "Modelis",
-    phone: "Telefons",
+    lic_plate: "Numurs",
     type: "Tips",
   };
 

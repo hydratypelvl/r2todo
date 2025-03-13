@@ -17,8 +17,8 @@ import { RefObject, useEffect, useMemo } from "react";
 
 interface DataTableRow {
   rowSpan?: number;
-  time?: string; // Add time to row interface
-  isPassed?: boolean; // Track if time has passed
+  time?: string;
+  isClosest?: boolean;
 }
 
 interface DataTableProps<TData extends DataTableRow> {
@@ -26,14 +26,6 @@ interface DataTableProps<TData extends DataTableRow> {
   currentTimeRowRef?: RefObject<HTMLTableRowElement | null>;
   onRemainingRowsCountChange?: (count: number) => void;
 }
-
-const isTimePassed = (time: string): boolean => {
-  const now = new Date();
-  const [hours, minutes] = time.split(':').map(Number);
-  const rowTime = new Date(now);
-  rowTime.setHours(hours, minutes, 0, 0);
-  return rowTime < now;
-};
 
 export function DataTable<TData extends DataTableRow>({
   table,
@@ -55,7 +47,7 @@ export function DataTable<TData extends DataTableRow>({
   }, [table]);
 
   // Find the closest time before current time
-  const closestRowTime = useMemo(() => {
+  const closestTime = useMemo(() => {
     let closestTime: string | null = null;
     let closestDiff = Infinity;
     const now = new Date();
@@ -75,14 +67,14 @@ export function DataTable<TData extends DataTableRow>({
     return closestTime;
   }, [timeToRowsMap]);
 
-  // Calculate counts and mark rows
+  // Mark closest rows and count remaining
   let remainingRowsCount = 0;
   timeToRowsMap.forEach((rows, time) => {
-    const passed = isTimePassed(time);
+    const isClosest = time === closestTime;
     rows.forEach(row => {
       row.time = time;
-      row.isPassed = passed;
-      if (!passed) remainingRowsCount++;
+      row.isClosest = isClosest;
+      if (!isClosest) remainingRowsCount++;
     });
   });
 
@@ -110,19 +102,15 @@ export function DataTable<TData extends DataTableRow>({
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => {
-              const time = row.original.time || "";
-              const isPassed = row.original.isPassed || false;
-              const isCurrent = time === closestRowTime;
+              const isClosest = row.original.isClosest || false;
 
               return (
                 <TableRow 
                   key={row.id}
-                  ref={isCurrent ? currentTimeRowRef as RefObject<HTMLTableRowElement> : null}
+                  ref={isClosest ? currentTimeRowRef as RefObject<HTMLTableRowElement> : null}
                   className={`border-b ${
-                    isCurrent
+                    isClosest
                       ? 'dark:bg-blue-900 bg-blue-100'
-                      : isPassed
-                      ? 'dark:bg-zinc-900 bg-slate-50'
                       : ''
                   }`}
                 >
