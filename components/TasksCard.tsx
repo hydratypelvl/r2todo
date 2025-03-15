@@ -1,5 +1,4 @@
 import * as React from "react"
-
 import {
   Card,
   CardContent,
@@ -8,15 +7,36 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-export function TasksCard(props: { description?: string, title: string, value: number, variant: string }) {
+interface TasksCardProps {
+  description?: string;
+  title: string;
+  value: number;
+  variant: string;
+  onClick?: () => void;
+  isActive?: boolean;
+}
+
+export function TasksCard({ 
+  description, 
+  title, 
+  value, 
+  variant, 
+  onClick, 
+  isActive 
+}: TasksCardProps) {
   return (
-    <Card className={`w-[350px] ${props.variant}`}  >
+    <Card 
+      className={`w-[350px] border-${variant} transition-all cursor-pointer ${
+        isActive ? "ring-red scale-[1.02]" : "hover:bg-muted/50"
+      }`}
+      onClick={onClick}
+    >
       <CardHeader className="p-0 pt-2">
-        <CardTitle>{props.title}</CardTitle>
-        <CardDescription>{props.description}</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
-      <CardContent className="pb-2">
-          {props.value}
+      <CardContent className="pb-2 text-2xl font-bold">
+        {value}
       </CardContent>
     </Card>
   )
