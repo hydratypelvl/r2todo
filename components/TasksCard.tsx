@@ -26,8 +26,8 @@ export function TasksCard({
 }: TasksCardProps) {
   return (
     <Card 
-      className={`w-[350px] border-${variant} transition-all cursor-pointer ${
-        isActive ? "ring-red scale-[1.02]" : "hover:bg-muted/50"
+      className={`w-[350px] ${variant} transition-all cursor-pointer ${
+        isActive ? "bg-muted/50" : "hover:bg-muted/50"
       }`}
       onClick={onClick}
     >

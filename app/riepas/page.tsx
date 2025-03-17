@@ -242,43 +242,47 @@ export default function Home() {
             <TasksCard 
               title="Kopā" 
               value={totals.all} 
-              variant="indigo-500" 
+              variant="border-indigo-500" 
               onClick={() => handleCardClick(null)}
               isActive={activeFilter === null}
             />
             <TasksCard 
               title="Mašīnas" 
               value={totals.cars} 
-              variant="blue-500" 
+              variant="border-blue-500" 
               onClick={() => handleCardClick('cars')}
               isActive={activeFilter === 'cars'}
             />
             <TasksCard 
               title="Moči" 
               value={totals.bikes} 
-              variant="green-500" 
+              variant="border-green-500" 
               onClick={() => handleCardClick('bikes')}
               isActive={activeFilter === 'bikes'}
             />
             <TasksCard 
               title="Kondiškas" 
               value={totals.ac} 
-              variant="red-500" 
+              variant="border-red-500" 
               onClick={() => handleCardClick('ac')}
               isActive={activeFilter === 'ac'}
             />
           </div>
 
           <div className="flex justify-between my-2">
-            <Diena 
-              onDateChange={setSelectedDate} 
-              value={selectedDate}
-            />
-            <ColumnVisibilityToggle table={table} />
-            {/* Button to scroll to current time row */}
-            <Button onClick={scrollToCurrentTime} disabled={remainingRowsCount === 0} variant="outline">
-              <ArrowDownToLine />
-            </Button>
+            <div>
+              <Diena 
+                onDateChange={setSelectedDate} 
+                value={selectedDate}
+              />
+            </div>
+            <div className="flex">
+              <ColumnVisibilityToggle table={table} />
+              {/* Button to scroll to current time row */}
+              <Button className="ml-2" onClick={scrollToCurrentTime} disabled={remainingRowsCount === 0} variant="outline">
+                <ArrowDownToLine />
+              </Button>
+            </div>
           </div>
 
           {/* Display remaining rows count */}
