@@ -37,11 +37,13 @@ export default function Home() {
     cars: 0,
     ac: 0,
     bikes: 0,
+    repairs: 0,
     filtered: {
       all: 0,
       cars: 0,
       ac: 0,
-      bikes: 0
+      bikes: 0,
+      repairs: 0
     }
   });
   const [selectedDate, setSelectedDate] = useState<string>(getLocalDate());
@@ -94,8 +96,9 @@ export default function Home() {
           all: 0, 
           cars: 0, 
           ac: 0, 
-          bikes: 0, 
-          filtered: { all: 0, cars: 0, ac: 0, bikes: 0 } 
+          bikes: 0,
+          repairs: 0,
+          filtered: { all: 0, cars: 0, ac: 0, bikes: 0, repairs: 0 },
         });
       } finally {
         setLoading(false);
@@ -114,18 +117,20 @@ export default function Home() {
         cars: 0,
         ac: 0,
         bikes: 0,
+        repairs: 0,
         filtered: {
           all: 0,
           cars: 0,
           ac: 0,
-          bikes: 0
+          bikes: 0,
+          repairs: 0
         }
       });
       return;
     }
   
-    let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0;
-    let filteredAll = 0, filteredCars = 0, filteredAC = 0, filteredBikes = 0;
+    let totalAll = 0, totalCars = 0, totalAC = 0, totalBikes = 0, totalRepairs = 0;
+    let filteredAll = 0, filteredCars = 0, filteredAC = 0, filteredBikes = 0, filteredRepairs = 0;
   
     const formatTime = (iorder: number) => {
       const baseHour = 9;
@@ -156,12 +161,14 @@ export default function Home() {
       totalAll++;
       if ([1, 2, 3].includes(takenby.service)) totalCars++;
       if (takenby.service === 6) totalAC++;
+      if (takenby.service === 4) totalRepairs++;
       if ([8, 9].includes(takenby.service)) totalBikes++;
 
       // Check if item passes current filter
       const passesFilter = !activeFilter || 
         (activeFilter === 'cars' && [1, 2, 3].includes(takenby.service)) ||
         (activeFilter === 'bikes' && [8, 9].includes(takenby.service)) ||
+        (activeFilter === 'repairs' && takenby.service === 4 ) ||
         (activeFilter === 'ac' && takenby.service === 6);
 
       if (passesFilter) {
@@ -185,6 +192,7 @@ export default function Home() {
         filteredAll++;
         if ([1, 2, 3].includes(takenby.service)) filteredCars++;
         if (takenby.service === 6) filteredAC++;
+        if (takenby.service === 4) filteredAC++;
         if ([8, 9].includes(takenby.service)) filteredBikes++;
       }
     });
@@ -207,11 +215,13 @@ export default function Home() {
       cars: totalCars,
       ac: totalAC,
       bikes: totalBikes,
+      repairs: totalRepairs,
       filtered: {
         all: filteredAll,
         cars: filteredCars,
         ac: filteredAC,
-        bikes: filteredBikes
+        bikes: filteredBikes,
+        repairs: filteredRepairs
       }
     });
 }, [allData, queueRange, activeFilter]);
@@ -238,34 +248,47 @@ export default function Home() {
             </Button>
           </div>
 
-          <div className="flex flex-4 flex-row justify-between gap-4 my-2 text-center">
-            <TasksCard 
-              title="Kopā" 
-              value={totals.all} 
-              variant="border-indigo-500" 
-              onClick={() => handleCardClick(null)}
-              isActive={activeFilter === null}
+          <div className="grid grid-cols-4 gap-3 sm:grid-cols-3 lg:grid-cols-5 text-center">
+            <TasksCard
+                title="Kopā"
+                value={totals.all}
+                variant="border-indigo-500"
+                onClick={() => handleCardClick(null)}
+                isActive={activeFilter === null}
+                className="col-span-4 sm:col-span-1"
             />
-            <TasksCard 
-              title="Mašīnas" 
-              value={totals.cars} 
-              variant="border-blue-500" 
-              onClick={() => handleCardClick('cars')}
-              isActive={activeFilter === 'cars'}
+
+            <TasksCard
+                title="Auto"
+                value={totals.cars}
+                variant="border-blue-500"
+                onClick={() => handleCardClick('cars')}
+                isActive={activeFilter === 'cars'}
             />
-            <TasksCard 
-              title="Moči" 
-              value={totals.bikes} 
-              variant="border-green-500" 
-              onClick={() => handleCardClick('bikes')}
-              isActive={activeFilter === 'bikes'}
+
+            <TasksCard
+                title="Moči"
+                value={totals.bikes}
+                variant="border-green-500"
+                onClick={() => handleCardClick('bikes')}
+                isActive={activeFilter === 'bikes'}
             />
-            <TasksCard 
-              title="Kondiškas" 
-              value={totals.ac} 
-              variant="border-red-500" 
-              onClick={() => handleCardClick('ac')}
-              isActive={activeFilter === 'ac'}
+
+            <TasksCard
+                title="AC"
+                value={totals.ac}
+                variant="border-red-500"
+                onClick={() => handleCardClick('ac')}
+                isActive={activeFilter === 'ac'}
+            />
+
+            <TasksCard
+                title="Remonts"
+                value={totals.repairs}
+                variant="border-orange-500"
+                onClick={() => handleCardClick('repairs')}
+                isActive={activeFilter === 'repairs'}
+
             />
           </div>
 

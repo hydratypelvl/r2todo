@@ -121,7 +121,7 @@ export function DataTable<TData extends DataTableRow>({
                     if (columnId === "time") {
                       const rowSpan = row.original.rowSpan;
                       return rowSpan && rowSpan > 0 ? (
-                        <TableCell key={cell.id} rowSpan={rowSpan} className="border text-center font-bold text-lg p-3 rounded-md">
+                        <TableCell key={cell.id} rowSpan={rowSpan} className="border text-center font-bold text-lg rounded-md">
                           {cellValue}
                         </TableCell>
                       ) : null;
@@ -129,9 +129,11 @@ export function DataTable<TData extends DataTableRow>({
 
                     if (columnId === "type") {
                       return (
-                        <TableCell key={cell.id} className="text-center flex justify-center">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
+                          <TableCell key={cell.id} className="text-center align-middle">
+                            <div className="flex items-center justify-center h-full">
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </div>
+                          </TableCell>
                       );
                     }
 

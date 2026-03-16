@@ -14,6 +14,7 @@ interface TasksCardProps {
   variant: string;
   onClick?: () => void;
   isActive?: boolean;
+  className?: string;
 }
 
 export function TasksCard({ 
@@ -22,11 +23,12 @@ export function TasksCard({
   value, 
   variant, 
   onClick, 
-  isActive 
+  isActive,
+  className,
 }: TasksCardProps) {
   return (
     <Card 
-      className={`w-[350px] ${variant} transition-all cursor-pointer ${
+      className={` ${variant} ${className} transition-all cursor-pointer ${
         isActive ? "bg-muted/50" : "hover:bg-muted/50"
       }`}
       onClick={onClick}
