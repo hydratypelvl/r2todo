@@ -304,21 +304,21 @@ export default function Home() {
         />
       )}
 
-      {loading ? (
-        <div className="flex justify-center mt-6">
-          <PieChartSkeleton />
-        </div>
-      ) : (
-        <div className="py-5">
-          <AppPieChart
-            data={[
-              { name: "Mašīnas", value: totals.cars, fill: "hsl(var(--chart-2))" },
-              { name: "Moči", value: totals.bikes, fill: "hsl(var(--chart-3))" },
-              { name: "Kondiškas", value: totals.ac, fill: "hsl(var(--chart-4))" },
-            ]}
-          />
-        </div>
-      )}
+      {/*{loading ? (*/}
+      {/*  <div className="flex justify-center mt-6">*/}
+      {/*    <PieChartSkeleton />*/}
+      {/*  </div>*/}
+      {/*) : (*/}
+      {/*  <div className="py-5">*/}
+      {/*    <AppPieChart*/}
+      {/*      data={[*/}
+      {/*        { name: "Mašīnas", value: totals.cars, fill: "hsl(var(--chart-2))" },*/}
+      {/*        { name: "Moči", value: totals.bikes, fill: "hsl(var(--chart-3))" },*/}
+      {/*        { name: "Kondiškas", value: totals.ac, fill: "hsl(var(--chart-4))" },*/}
+      {/*      ]}*/}
+      {/*    />*/}
+      {/*  </div>*/}
+      {/*)}*/}
     </div>
   );
 }
