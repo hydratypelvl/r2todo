@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { CarFront, Bike, ThermometerSnowflake, CircleHelp } from "lucide-react"
+import { CarFront, Bike, ThermometerSnowflake, CircleHelp, Wrench } from "lucide-react"
 
 // Job Data Type
 export interface Job {
@@ -53,6 +53,7 @@ export const columns: ColumnDef<Job>[] = [
       if ([1, 2, 3].includes(type)) return <CarFront className="text-blue-500" />;
       if ([8, 9].includes(type)) return <Bike className="text-green-500" />;
       if (type === 6) return <ThermometerSnowflake className="text-red-500" />;
+      if (type === 4) return <Wrench className="text-orange-500" />;
       return <CircleHelp className="text-gray-400" />;
     },
   },
