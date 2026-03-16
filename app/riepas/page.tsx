@@ -229,9 +229,7 @@ export default function Home() {
   return (
     <div className="container mx-auto my-4">
       {loading ? (
-        <div className="flex flex-row justify-between gap-4 my-2 text-center">
           <TasksSkeleton />
-        </div>
       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
@@ -316,7 +314,7 @@ export default function Home() {
       )}
 
       {loading ? (
-        <div className="flex flex-4 flex-row justify-between gap-4 my-2 text-center">
+        <div className="my-4">
           <SkeletonTable />
         </div>
       ) : (
