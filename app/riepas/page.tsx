@@ -9,10 +9,10 @@ import { TasksCard } from "@/components/TasksCard";
 import { ColumnVisibilityToggle } from "@/components/ColumnVisibilityToggle";
 import { useReactTable, getCoreRowModel, VisibilityState } from "@tanstack/react-table";
 import { Diena } from "@/components/Diena";
-import { AppPieChart } from "@/components/AppPieChart";
+// import { AppPieChart } from "@/components/AppPieChart";
 import { SkeletonTable } from "@/components/skeletons/SkeletonTable";
 import { TasksSkeleton } from "@/components/skeletons/TasksSkeleton";
-import { PieChartSkeleton } from "@/components/skeletons/PieChartSkeleton";
+// import { PieChartSkeleton } from "@/components/skeletons/PieChartSkeleton";
 import { fetchJobs } from "@/app/actions";
 import { ArrowDownToLine } from "lucide-react";
 
@@ -192,7 +192,7 @@ export default function Home() {
         filteredAll++;
         if ([1, 2, 3].includes(takenby.service)) filteredCars++;
         if (takenby.service === 6) filteredAC++;
-        if (takenby.service === 4) filteredAC++;
+        if (takenby.service === 4) filteredRepairs++;
         if ([8, 9].includes(takenby.service)) filteredBikes++;
       }
     });
